@@ -1,0 +1,29 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ernestoyaquello.TicTacToeApp", "Ernestoyaquello.TicTacToeApp.csproj", "{8B405C0B-9EC0-42B2-B5DA-2E15BFE8AF28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ernestoyaquello.TicTacToe", "..\Ernestoyaquello.TicTacToe\Ernestoyaquello.TicTacToe.csproj", "{8C387896-25F3-44BB-97FC-B275E7237F2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ernestoyaquello.TwoPlayerZeroSumGameEngine", "..\Ernestoyaquello.TwoPlayerZeroSumGameEngine\Ernestoyaquello.TwoPlayerZeroSumGameEngine.csproj", "{DBD298E3-5E16-4D18-B5A3-2EF68EE25C7D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8B405C0B-9EC0-42B2-B5DA-2E15BFE8AF28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B405C0B-9EC0-42B2-B5DA-2E15BFE8AF28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B405C0B-9EC0-42B2-B5DA-2E15BFE8AF28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B405C0B-9EC0-42B2-B5DA-2E15BFE8AF28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C387896-25F3-44BB-97FC-B275E7237F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C387896-25F3-44BB-97FC-B275E7237F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C387896-25F3-44BB-97FC-B275E7237F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C387896-25F3-44BB-97FC-B275E7237F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD298E3-5E16-4D18-B5A3-2EF68EE25C7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD298E3-5E16-4D18-B5A3-2EF68EE25C7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD298E3-5E16-4D18-B5A3-2EF68EE25C7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD298E3-5E16-4D18-B5A3-2EF68EE25C7D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

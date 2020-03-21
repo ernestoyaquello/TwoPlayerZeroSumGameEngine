@@ -1,0 +1,29 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ernestoyaquello.Connect4App", "Ernestoyaquello.Connect4App.csproj", "{015F4E7E-5DD3-4702-BE0F-2D5437F2A87D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ernestoyaquello.Connect4", "..\Ernestoyaquello.Connect4\Ernestoyaquello.Connect4.csproj", "{245B5700-9378-4C69-8E35-E917F6C264C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ernestoyaquello.TwoPlayerZeroSumGameEngine", "..\Ernestoyaquello.TwoPlayerZeroSumGameEngine\Ernestoyaquello.TwoPlayerZeroSumGameEngine.csproj", "{82A12326-B0CE-4A9D-99E3-B9C1AB720D65}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{015F4E7E-5DD3-4702-BE0F-2D5437F2A87D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{015F4E7E-5DD3-4702-BE0F-2D5437F2A87D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{015F4E7E-5DD3-4702-BE0F-2D5437F2A87D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{015F4E7E-5DD3-4702-BE0F-2D5437F2A87D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{245B5700-9378-4C69-8E35-E917F6C264C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{245B5700-9378-4C69-8E35-E917F6C264C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{245B5700-9378-4C69-8E35-E917F6C264C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{245B5700-9378-4C69-8E35-E917F6C264C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82A12326-B0CE-4A9D-99E3-B9C1AB720D65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82A12326-B0CE-4A9D-99E3-B9C1AB720D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82A12326-B0CE-4A9D-99E3-B9C1AB720D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82A12326-B0CE-4A9D-99E3-B9C1AB720D65}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
