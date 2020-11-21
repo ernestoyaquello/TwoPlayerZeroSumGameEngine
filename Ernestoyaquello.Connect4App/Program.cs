@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Ernestoyaquello.Connect4;
 using Ernestoyaquello.Connect4.Models;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Engine;
 using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Util;
 
 namespace Ernestoyaquello.Connect4App
 {
@@ -11,26 +12,28 @@ namespace Ernestoyaquello.Connect4App
     {
         static async Task Main(string[] args)
         {
-            var ticTacToeEngine = new Connect4Engine();
-            await PlayConnect4(ticTacToeEngine);
+            var gameEngine = new TwoPlayerZeroSumGameMovesEngine();
+            gameEngine.Initialize(8);
+            await PlayConnect4(gameEngine);
         }
 
-        private static async Task PlayConnect4(Connect4Engine gameEngine, bool firstPlayerStarts = true)
+        private static async Task PlayConnect4(TwoPlayerZeroSumGameMovesEngine gameEngine, bool humanIsFirstPlayer = true)
         {
-            var board = new Connect4Board();
-            gameEngine.Initialise(board);
-            PrintBoard(board);
+            var humanPlayer = humanIsFirstPlayer ? Player.First : Player.Second;
+            var board = new Connect4Board(gameEngine);
+            PrintBoard(board, humanPlayer);
 
-            if (!firstPlayerStarts)
+            if (!humanIsFirstPlayer)
             {
                 Console.CursorVisible = false;
                 Console.SetCursorPosition(0, Console.WindowHeight);
                 Console.Write("Calculating first move...");
 
-                var firstMove = await gameEngine.GetBestMove(Player.Second).ConfigureAwait(false);
-                board.TryMakeMove(firstMove);
+                var firstMoveResult = await gameEngine.CalculateBestMove<Connect4Board, Connect4MoveInfo, Connect4BoardState>(board, Player.First).ConfigureAwait(false);
+                var firstMove = firstMoveResult.BestMove;
+                gameEngine.TryMakeMove<Connect4Board, Connect4MoveInfo, Connect4BoardState>(board, firstMove, false);
 
-                PrintBoard(board);
+                PrintBoard(board, humanPlayer);
             }
 
             var selectedColumn = 0;
@@ -53,26 +56,27 @@ namespace Ernestoyaquello.Connect4App
                         break;
 
                     case ConsoleKey.RightArrow:
-                        selectedColumn = selectedColumn < (board.GetStateCopy().Columns.Length - 1)
+                        selectedColumn = selectedColumn < (board.Clone().State.Columns.Length - 1)
                             ? selectedColumn + 1
                             : selectedColumn;
                         break;
 
                     case ConsoleKey.Enter:
-                        DrawMove(board, selectedColumn, cursorLeft, cursorTop);
+                        DrawMove(board, selectedColumn, cursorLeft, cursorTop, humanPlayer);
                         Console.SetCursorPosition(0, Console.WindowHeight);
                         Console.Write("Calculating move...");
-                        var move = new Connect4MoveInfo(Player.First, selectedColumn);
-                        gameResult = await gameEngine.MakeMoveAndGetResult(move).ConfigureAwait(false);
-                        PrintBoard(board);
+                        var humanMove = new Connect4MoveInfo(humanPlayer, selectedColumn);
+                        await gameEngine.MakeMoveAgainstMachine<Connect4Board, Connect4MoveInfo, Connect4BoardState>(board, humanMove).ConfigureAwait(false);
+                        gameResult = board.GetGameResult(humanMove.Player);
+                        PrintBoard(board, humanPlayer);
                         break;
 
                     case ConsoleKey.Q:
-                        PrintBoard(board);
+                        PrintBoard(board, humanPlayer);
                         return;
 
                     default:
-                        PrintBoard(board);
+                        PrintBoard(board, humanPlayer);
                         break;
                 }
 
@@ -81,16 +85,16 @@ namespace Ernestoyaquello.Connect4App
             }
 
             PrintGameResult(gameResult);
-            await PlayConnect4(gameEngine, !firstPlayerStarts);
+            await PlayConnect4(gameEngine, !humanIsFirstPlayer);
         }
 
-        private static void DrawMove(Connect4Board board, int selectedColumn, int cursorLeft, int cursorTop)
+        private static void DrawMove(Connect4Board board, int selectedColumn, int cursorLeft, int cursorTop, Player humanPlayer)
         {
-            var boardState = board.GetStateCopy();
+            var boardState = board.Clone().State;
             Console.CursorVisible = false;
             var emptyPositions = boardState.Columns[selectedColumn].Count(player => player == Player.None);
             Console.SetCursorPosition(cursorLeft, cursorTop + emptyPositions);
-            Console.Write(Connect4Board.FromPlayerToString(Player.First));
+            Console.Write(Connect4Board.FromPlayerToString(humanPlayer));
         }
 
         private static void PrintGameResult(GameResult gameResult)
@@ -116,7 +120,7 @@ namespace Ernestoyaquello.Connect4App
             Console.ReadKey();
         }
 
-        private static void PrintBoard(Connect4Board board)
+        private static void PrintBoard(Connect4Board board, Player humanPlayer)
         {
             Console.Clear();
             var cursorTop = Console.WindowHeight - 9;
@@ -126,8 +130,8 @@ namespace Ernestoyaquello.Connect4App
             Console.Write("\n");
             Console.Write("Players:\n");
             Console.Write("\n");
-            Console.Write($"* You: {Connect4Board.FromPlayerToString(Player.First)}\n");
-            Console.Write($"* Computer: {Connect4Board.FromPlayerToString(Player.Second)}\n");
+            Console.Write($"* You: {Connect4Board.FromPlayerToString(humanPlayer)}\n");
+            Console.Write($"* Computer: {Connect4Board.FromPlayerToString(humanPlayer.ToOppositePlayer())}\n");
             Console.Write("\n");
             Console.Write("How to play:\n");
             Console.Write("\n");

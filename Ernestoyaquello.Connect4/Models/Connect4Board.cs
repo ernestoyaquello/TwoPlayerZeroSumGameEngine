@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Engine;
 using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Util;
 
 namespace Ernestoyaquello.Connect4.Models
 {
     public class Connect4Board : BaseBoard<Connect4MoveInfo, Connect4BoardState>
     {
-        public Connect4Board()
-            : base(new Connect4BoardState(new Player[7][]
+        public Connect4Board(ITwoPlayerZeroSumGameMovesEngine movesEngine)
+            : this(new Connect4BoardState(new Player[7][]
             {
                 new Player[6] { Player.None, Player.None, Player.None, Player.None, Player.None, Player.None },
                 new Player[6] { Player.None, Player.None, Player.None, Player.None, Player.None, Player.None },
@@ -16,32 +18,37 @@ namespace Ernestoyaquello.Connect4.Models
                 new Player[6] { Player.None, Player.None, Player.None, Player.None, Player.None, Player.None },
                 new Player[6] { Player.None, Player.None, Player.None, Player.None, Player.None, Player.None },
                 new Player[6] { Player.None, Player.None, Player.None, Player.None, Player.None, Player.None },
-            }))
+            }), movesEngine)
         {
         }
 
-        protected override void MakeMove(Connect4MoveInfo moveInfo)
+        private Connect4Board(Connect4BoardState boardState, ITwoPlayerZeroSumGameMovesEngine movesEngine)
+            : base(boardState, movesEngine)
         {
-            var column = State.Columns[moveInfo.Column];
-            var position = column.Count(player => player != Player.None);
-            column[position] = moveInfo.Player;
         }
 
-        protected override bool IsValidMove(Connect4MoveInfo moveInfo)
+        public override bool IsValidMove(Connect4MoveInfo moveInfo)
         {
             var column = State.Columns[moveInfo.Column];
             return column.Any(player => player == Player.None) &&
                 GetWinner() == Player.None;
         }
 
-        protected override bool AreThereValidMoves()
+        public override void MakeMove(Connect4MoveInfo moveInfo)
+        {
+            var column = State.Columns[moveInfo.Column];
+            var position = column.Count(player => player != Player.None);
+            column[position] = moveInfo.Player;
+        }
+
+        public override bool AreThereValidMoves(Player player)
         {
             var allValues = State.Columns.SelectMany(column => column);
             return allValues.Any(player => player == Player.None) &&
                 GetWinner() == Player.None;
         }
 
-        protected override IList<Connect4MoveInfo> CalculateValidMoves(Player player)
+        protected override List<Connect4MoveInfo> CalculateValidMoves(Player player)
         {
             return State.Columns
                 .Select((column, index) => column.Any(player => player == Player.None)
@@ -209,6 +216,11 @@ namespace Ernestoyaquello.Connect4.Models
 
         protected override double CalculateHeuristicGameScore(Player player)
         {
+            return (0.75d * CalculateGameScore(player)) - (0.25d * CalculateGameScore(player.ToOppositePlayer()));
+        }
+
+        private double CalculateGameScore(Player player)
+        {
             var totalScore = 0d;
 
             var numberOfIterations = 0;
@@ -272,7 +284,9 @@ namespace Ernestoyaquello.Connect4.Models
             }
 
             var normalisedScore = totalScore / numberOfIterations;
-            return normalisedScore;
+            var correctedScore = normalisedScore <= 0d ? 0.00001d : normalisedScore;
+            correctedScore = correctedScore >= 1d ? 0.99999d : correctedScore;
+            return correctedScore;
         }
 
         private int GetCandidateSequenceScore(Player player, Player[] candidateSequence)
@@ -322,6 +336,11 @@ namespace Ernestoyaquello.Connect4.Models
                 default:
                     return " ";
             }
+        }
+
+        protected override BaseBoard<Connect4MoveInfo, Connect4BoardState> CreateNew(Connect4BoardState boardState, ITwoPlayerZeroSumGameMovesEngine movesEngine)
+        {
+            return new Connect4Board(boardState, movesEngine);
         }
     }
 }

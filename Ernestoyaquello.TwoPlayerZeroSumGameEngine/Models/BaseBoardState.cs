@@ -1,4 +1,7 @@
-﻿namespace Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models
 {
     /// <summary>
     /// A model implementing this base class will represent the board state and hold its data.
@@ -7,16 +10,28 @@
     /// <typeparam name="TMoveInfo">The type of moves that the board represented by this state makes use of.</typeparam>
     public abstract class BaseBoardState<TMoveInfo> where TMoveInfo : BaseMoveInfo
     {
+        internal List<TMoveInfo> History { get; private set; }
         internal StateCache<TMoveInfo> CachedData { get; set; }
+
+        protected BaseBoardState()
+        {
+            History = new List<TMoveInfo>();
+            CachedData = new StateCache<TMoveInfo>();
+        }
 
         public BaseBoardState<TMoveInfo> CloneBoardState()
         {
             var clone = Clone();
-            clone.CachedData = CachedData?.Clone();
+            clone.History = History.ToList();
+            clone.CachedData = CachedData.Clone();
 
             return clone;
         }
 
+        /// <summary>
+        /// Returns a copy of the object.
+        /// </summary>
+        /// <returns>A copy of the object.</returns>
         protected abstract BaseBoardState<TMoveInfo> Clone();
 
         /// <summary>

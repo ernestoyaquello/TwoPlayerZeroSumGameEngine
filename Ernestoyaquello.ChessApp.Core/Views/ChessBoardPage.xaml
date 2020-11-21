@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Ernestoyaquello.ChessApp.Views.ChessBoardPage"
+    xmlns:controls="clr-namespace:Ernestoyaquello.ChessApp.Controls"
+    xmlns:vm="clr-namespace:Ernestoyaquello.ChessApp.ViewModels"
+    xmlns:vmModels="clr-namespace:Ernestoyaquello.ChessApp.ViewModels.Models"
+    xmlns:chess="clr-namespace:Ernestoyaquello.Chess.Models;assembly=Ernestoyaquello.Chess"
+    x:DataType="vm:ChessBoardPageViewModel"
+    Title="{Binding Title}"
+    BackgroundColor="#1d1c1b">
+
+    <Grid
+        RowSpacing="0"
+        ColumnSpacing="0"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        BackgroundColor="#3a3a3a">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <controls:ChessBoardView
+            Grid.Column="0"
+            x:Name="ChessBoard"
+            BackgroundColor="#3a3a3a"
+            HorizontalOptions="Start"
+            VerticalOptions="Center"
+            Board="{Binding Board}"
+            HumanPlayer="{Binding HumanPlayer}"
+            SelectedPiece="{Binding SelectedPiece}"
+            PositionsForSelectedPiece="{Binding PositionsForSelectedPiece}"
+            LastMovePositions="{Binding LastMovePositions}"
+            PieceTappedCommand="{Binding PieceTappedCommand}"
+            IsClickable="{Binding PlayerCanMove}"
+            PlayerInCheck="{Binding PlayerInCheck}"
+            ShowLoader="{Binding IsMachineMakingMove}"
+            LoaderProgress="{Binding ProgressMadeByMachine}"/>
+
+        <!-- TODO: The game tracker could be a control -->
+        <Grid
+            Grid.Column="1"
+            x:Name="GameTracker"
+            RowSpacing="0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackLayout
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Margin="20,0,20,10"
+                Orientation="Horizontal"
+                Spacing="15">
+
+                <Label
+                    VerticalOptions="Center"
+                    VerticalTextAlignment="Center"
+                    HorizontalOptions="StartAndExpand"
+                    HorizontalTextAlignment="Start"
+                    FontSize="15"
+                    TextColor="White"
+                    Text="Tree depth:"/>
+
+                <Picker
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    IsEnabled="{Binding PlayerCanMove}"
+                    ItemsSource="{Binding TreeDepthOptions}"
+                    SelectedItem="{Binding MaxTreeDepth}"/>
+
+            </StackLayout>
+
+            <BoxView
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                HeightRequest="3"
+                Margin="20,10,20,0"
+                BackgroundColor="#1d1c1b" />
+
+            <Label
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Margin="20,15,20,5"
+                HorizontalTextAlignment="Start"
+                VerticalTextAlignment="Center"
+                FontSize="22"
+                TextColor="White"
+                Text="{Binding GameResultAsString}" />
+
+            <Label
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Margin="20,5,20,10"
+                HorizontalTextAlignment="Start"
+                VerticalTextAlignment="Center"
+                FontSize="17"
+                TextColor="#bebebe"
+                Text="{Binding GameTurnStatusAsString}"/>
+            
+            <Label
+                Grid.Row="5"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="20,10,10,0"
+                Padding="10,5"
+                FontSize="13"
+                BackgroundColor="#1d1c1b"
+                TextColor="#bebebe"
+                Text="Captured by white:"/>
+
+            <Label
+                Grid.Row="5"
+                Grid.Column="2"
+                Grid.ColumnSpan="2"
+                Margin="5,10,20,0"
+                Padding="10,5"
+                FontSize="13"
+                BackgroundColor="#1d1c1b"
+                TextColor="#bebebe"
+                Text="Captured by black:"/>
+
+            <CollectionView
+                Grid.Row="6"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="20,0,10,10"
+                HeightRequest="50"
+                BackgroundColor="#1d1c1b"
+                x:Name="PiecesCapturedByWhite"
+                SelectionMode="None"
+                ItemsLayout="HorizontalList"
+                ItemsSource="{Binding PiecesCapturesByWhite}">
+
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate
+                        x:DataType="chess:Piece">
+
+                        <controls:ChessBoardPieceView
+                            WidthRequest="50"
+                            HeightRequest="50"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            IsClickable="True"
+                            Piece="{Binding .}" />
+
+                    </DataTemplate>
+
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+            <CollectionView
+                Grid.Row="6"
+                Grid.Column="2"
+                Grid.ColumnSpan="2"
+                Margin="5,0,20,10"
+                HeightRequest="50"
+                BackgroundColor="#1d1c1b"
+                x:Name="PiecesCapturedByBlack"
+                SelectionMode="None"
+                ItemsLayout="HorizontalList"
+                ItemsSource="{Binding PiecesCapturesByBlack}">
+
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate
+                        x:DataType="chess:Piece">
+
+                        <controls:ChessBoardPieceView
+                            WidthRequest="50"
+                            HeightRequest="50"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            IsClickable="True"
+                            Piece="{Binding .}" />
+
+                    </DataTemplate>
+
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+            <Label
+                Grid.Row="7"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Margin="20,10,20,0"
+                Padding="10,5"
+                FontSize="13"
+                BackgroundColor="#1d1c1b"
+                TextColor="#bebebe"
+                Text="Moves:"/>
+            
+            <ContentView
+                Grid.Row="8"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Margin="20,0,20,20"
+                BackgroundColor="#1d1c1b"
+                Padding="0,5">
+
+                <ListView
+                    x:Name="MovesList"
+                    SelectionMode="None"
+                    ItemsSource="{Binding History}">
+
+                    <ListView.ItemTemplate>
+
+                        <DataTemplate
+                            x:DataType="vmModels:ChessMoveItem">
+
+                            <ViewCell>
+
+                                <StackLayout
+                                    VerticalOptions="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="5"
+                                    Padding="10,5">
+
+                                    <Label
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center"
+                                        HorizontalTextAlignment="Start"
+                                        VerticalTextAlignment="Center"
+                                        FontSize="14"
+                                        TextColor="White"
+                                        Margin="0,0,5,0"
+                                        Text="{Binding PlayerName}" />
+
+                                    <Label
+                                        HorizontalOptions="StartAndExpand"
+                                        VerticalOptions="Center"
+                                        HorizontalTextAlignment="Start"
+                                        VerticalTextAlignment="Center"
+                                        FontSize="14"
+                                        TextColor="#bebebe"
+                                        Text="{Binding LongDescription}" />
+
+                                </StackLayout>
+
+                            </ViewCell>
+
+                        </DataTemplate>
+
+                    </ListView.ItemTemplate>
+
+                </ListView>
+
+            </ContentView>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

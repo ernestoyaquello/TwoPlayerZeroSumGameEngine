@@ -1,40 +1,46 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Engine;
 using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models;
 
 namespace Ernestoyaquello.TicTacToe.Models
 {
     public class TicTacToeBoard : BaseBoard<TicTacToeMoveInfo, TicTacToeBoardState>
     {
-        public TicTacToeBoard()
-            : base(new TicTacToeBoardState(new Player[3][]
+        public TicTacToeBoard(ITwoPlayerZeroSumGameMovesEngine movesEngine)
+            : this(new TicTacToeBoardState(new Player[3][]
             {
                 new Player[3] { Player.None, Player.None, Player.None },
                 new Player[3] { Player.None, Player.None, Player.None },
                 new Player[3] { Player.None, Player.None, Player.None },
-            }))
+            }), movesEngine)
         {
         }
 
-        protected override void MakeMove(TicTacToeMoveInfo moveInfo)
+        private TicTacToeBoard(TicTacToeBoardState boardState, ITwoPlayerZeroSumGameMovesEngine movesEngine)
+            : base(boardState, movesEngine)
         {
-            State.BoardData[moveInfo.Row][moveInfo.Column] = moveInfo.Player;
         }
 
-        protected override bool IsValidMove(TicTacToeMoveInfo moveInfo)
+        public override bool IsValidMove(TicTacToeMoveInfo moveInfo)
         {
             return State.BoardData[moveInfo.Row][moveInfo.Column] == Player.None &&
                 GetWinner() == Player.None;
         }
 
-        protected override bool AreThereValidMoves()
+        public override void MakeMove(TicTacToeMoveInfo moveInfo)
+        {
+            State.BoardData[moveInfo.Row][moveInfo.Column] = moveInfo.Player;
+        }
+
+        public override bool AreThereValidMoves(Player player)
         {
             var allValues = State.BoardData.SelectMany(row => row);
             return allValues.Any(player => player == Player.None) &&
                 GetWinner() == Player.None;
         }
 
-        protected override IList<TicTacToeMoveInfo> CalculateValidMoves(Player player)
+        protected override List<TicTacToeMoveInfo> CalculateValidMoves(Player player)
         {
             var validMoves = new List<TicTacToeMoveInfo>();
 
@@ -128,8 +134,8 @@ namespace Ernestoyaquello.TicTacToe.Models
 
         protected override double CalculateHeuristicGameScore(Player player)
         {
-            // This game is simple enough for the game engine to be able to check all
-            // the possible moves, which means that this function will never be called
+            // This game is simple enough for the game engine to be able to check all the possible available moves,
+            // which means that this function will never be called (the tree must have a maximum depth of 9 or more)
             return 0d;
         }
 
@@ -163,6 +169,11 @@ namespace Ernestoyaquello.TicTacToe.Models
                 default:
                     return "A";
             }
+        }
+
+        protected override BaseBoard<TicTacToeMoveInfo, TicTacToeBoardState> CreateNew(TicTacToeBoardState boardState, ITwoPlayerZeroSumGameMovesEngine movesEngine)
+        {
+            return new TicTacToeBoard(boardState, movesEngine);
         }
     }
 }

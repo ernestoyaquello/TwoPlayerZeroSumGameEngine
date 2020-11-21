@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<prism:PrismApplication
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:prism="http://prismlibrary.com"
+    xmlns:converters="clr-namespace:Ernestoyaquello.ChessApp.Converters"
+    x:Class="Ernestoyaquello.ChessApp.App">
+    
+    <Application.Resources>
+        
+        <ResourceDictionary>
+
+            <converters:FromAutomaticTestStatusToSuccessTextConverter x:Key="FromAutomaticTestStatusToSuccessTextConverter" />
+            <converters:FromAutomaticTestStatusToColorTextConverter x:Key="FromAutomaticTestStatusToColorTextConverter" />
+
+        </ResourceDictionary>
+
+    </Application.Resources>
+    
+</prism:PrismApplication>

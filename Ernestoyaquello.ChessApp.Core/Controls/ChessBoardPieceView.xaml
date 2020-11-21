@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Grid
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Ernestoyaquello.ChessApp.Controls.ChessBoardPieceView"
+    x:Name="chessBoardPiece">
+
+    <BoxView
+        Margin="5"
+        BackgroundColor="{Binding Source={x:Reference chessBoardPiece}, Path=FillColor}"/>
+
+    <BoxView
+        BackgroundColor="{Binding Source={x:Reference chessBoardPiece}, Path=HighlightedBackgroundColor}"
+        IsVisible="{Binding Source={x:Reference chessBoardPiece}, Path=HighlightBackground}"/>
+
+    <BoxView
+        x:Name="DangerColorOverlay"
+        BackgroundColor="{Binding Source={x:Reference chessBoardPiece}, Path=DangerBackgroundColor}"
+        IsVisible="{Binding Source={x:Reference chessBoardPiece}, Path=ShowDangerBackground}"/>
+
+    <Label
+        HorizontalOptions="Start"
+        VerticalOptions="Start"
+        Margin="5"
+        Text="{Binding Source={x:Reference chessBoardPiece}, Path=TopLeftText}"
+        TextColor="{Binding Source={x:Reference chessBoardPiece}, Path=TextColor}" />
+
+    <Label
+        HorizontalOptions="End"
+        VerticalOptions="End"
+        Margin="5"
+        Text="{Binding Source={x:Reference chessBoardPiece}, Path=BottomRightText}"
+        TextColor="{Binding Source={x:Reference chessBoardPiece}, Path=TextColor}" />
+
+    <ImageButton
+        x:Name="PieceImage"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        Aspect="AspectFit"
+        BackgroundColor="Transparent"
+        Padding="5"
+        IsEnabled="{Binding Source={x:Reference chessBoardPiece}, Path=IsClickable}"
+        Command="{Binding Source={x:Reference chessBoardPiece}, Path=OnTappedCommand}"
+        CommandParameter="{Binding Source={x:Reference chessBoardPiece}, Path=Piece}"/>
+
+    <ImageButton
+        x:Name="CandidatePieceOverlay"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        Aspect="AspectFit"
+        BackgroundColor="Transparent"
+        Padding="5"
+        Source="Assets/candidate.png"
+        IsEnabled="{Binding Source={x:Reference chessBoardPiece}, Path=IsClickable}"
+        IsVisible="{Binding Source={x:Reference chessBoardPiece}, Path=IsCandidate}"
+        Command="{Binding Source={x:Reference chessBoardPiece}, Path=OnTappedCommand}"
+        CommandParameter="{Binding Source={x:Reference chessBoardPiece}, Path=Piece}"/>
+
+</Grid>

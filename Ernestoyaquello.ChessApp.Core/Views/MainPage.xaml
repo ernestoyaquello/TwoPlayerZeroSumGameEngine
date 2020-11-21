@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Ernestoyaquello.ChessApp.Views.MainPage"
+    xmlns:controls="clr-namespace:Ernestoyaquello.ChessApp.Controls"
+    xmlns:vm="clr-namespace:Ernestoyaquello.ChessApp.ViewModels"
+    x:DataType="vm:MainPageViewModel"
+    BackgroundColor="#1d1c1b"
+    Title="{Binding Title}">
+
+    <Grid
+        ColumnSpacing="15"
+        RowSpacing="15">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <BoxView
+            Grid.Row="1"
+            Grid.Column="1"
+            Grid.RowSpan="10"
+            Grid.ColumnSpan="4"
+            BackgroundColor="#3a3a3a" />
+
+        <Label
+            Grid.Row="2"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            HorizontalOptions="Center"
+            HorizontalTextAlignment="Center"
+            FontSize="25"
+            TextColor="White"
+            Text="Match Setup"/>
+
+        <controls:ChessBoardPieceView
+            Grid.Row="3"
+            Grid.Column="2"
+            HorizontalOptions="Start"
+            IsClickable="True"
+            FillColor="#3a3a3a"
+            WidthRequest="100"
+            HeightRequest="100"
+            Piece="{Binding WhitePiece}"
+            IsSelected="{Binding IsWhitePieceSelected}"
+            OnTappedCommand="{Binding OnWhitePieceTappedCommand}"/>
+
+        <controls:ChessBoardPieceView
+            Grid.Row="3"
+            Grid.Column="3"
+            HorizontalOptions="End"
+            IsClickable="True"
+            FillColor="#3a3a3a"
+            WidthRequest="100"
+            HeightRequest="100"
+            Piece="{Binding BlackPiece}"
+            IsSelected="{Binding IsBlackPieceSelected}"
+            OnTappedCommand="{Binding OnBlackPieceTappedCommand}"/>
+
+        <Label
+            Grid.Row="4"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            HorizontalOptions="Start"
+            HorizontalTextAlignment="Start"
+            Margin="0,5,0,-5"
+            FontSize="14"
+            TextColor="#bebebe"
+            Text="Layout type:"/>
+        
+        <Picker
+            Grid.Row="5"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding BoardLayoutOptions}"
+            SelectedItem="{Binding SelectedBoardLayoutOption}"/>
+
+        <Label
+            Grid.Row="6"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            HorizontalOptions="Start"
+            HorizontalTextAlignment="Start"
+            Margin="0,5,0,-5"
+            FontSize="14"
+            TextColor="#bebebe"
+            Text="Tree depth:"/>
+        
+        <Picker
+            Grid.Row="7"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding TreeDepthOptions}"
+            SelectedItem="{Binding SelectedMaxTreeDepth}"/>
+
+        <Button
+            Grid.Row="8"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            Padding="10"
+            TextColor="White"
+            BackgroundColor="DarkOrange"
+            FontSize="15"
+            Text="Start Match"
+            Command="{Binding PlayMatchButtonCommand}" />
+
+        <Button
+            Grid.Row="9"
+            Grid.Column="2"
+            Grid.ColumnSpan="2"
+            Padding="10"
+            TextColor="White"
+            BackgroundColor="DarkOrange"
+            FontSize="15"
+            Text="Open Tests Screen"
+            Command="{Binding OpenTestsScreen}" />
+
+    </Grid>
+
+</ContentPage>
