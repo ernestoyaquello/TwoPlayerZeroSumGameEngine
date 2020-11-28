@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Engine;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Util;
 
 namespace Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models
 {
@@ -14,70 +17,91 @@ namespace Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models
         where TMoveInfo : BaseMoveInfo
         where TBoardState : BaseBoardState<TMoveInfo>
     {
-        /// <summary>
-        /// The state of the board. E.g. the positions of all the chips.
-        /// </summary>
-        protected TBoardState State { get; private set; }
+        public TBoardState State { get; }
+        public ITwoPlayerZeroSumGameMovesEngine MovesEngine { get; }
 
-        protected BaseBoard(TBoardState state)
+        protected BaseBoard(TBoardState state, ITwoPlayerZeroSumGameMovesEngine movesEngine)
         {
             State = state;
+            MovesEngine = movesEngine;
         }
 
-        ///<inheritdoc/>
-        public bool TryMakeMove(TMoveInfo moveInfo)
-        {
-            var isValidMove = IsValidMove(moveInfo);
-            if (isValidMove)
-            {
-                ClearCachedData();
-                MakeMove(moveInfo);
-            }
-
-            return isValidMove;
-        }
-
-        ///<inheritdoc/>
-        public IList<TMoveInfo> GetValidMoves(Player player)
+        public List<TMoveInfo> GetValidMoves(Player player)
         {
             // Since calculating the valid moves of a player can be expensive, we only do it if necessary
-            var cachedData = GetCachedData();
-            if (!cachedData.ValidMovesPerPlayer.ContainsKey(player))
+            if (!State.CachedData.ValidMovesPerPlayer.ContainsKey(player))
             {
-                cachedData.ValidMovesPerPlayer[player] = CalculateValidMoves(player);
+                State.CachedData.ValidMovesPerPlayer[player] = CalculateValidMoves(player);
             }
 
-            return cachedData.ValidMovesPerPlayer[player];
+            return State.CachedData.ValidMovesPerPlayer[player];
         }
 
-        ///<inheritdoc/>
+        public bool IsPlayerTurn(Player player)
+        {
+            return (!State.History.Any() && player == Player.First) || (State.History.Any() && State.History.Last().Player != player);
+        }
+
         public GameResult GetGameResult(Player player)
         {
             // Since calculating the game result can be expensive, we only do it if necessary
-            var cachedData = GetCachedData();
-            cachedData.Result ??= CalculateGameResult(player);
+            if (State.CachedData.ResultFirstPlayer == null || State.CachedData.ResultSecondPlayer == null)
+            {
+                if (player == Player.First)
+                {
+                    State.CachedData.ResultFirstPlayer = CalculateGameResult(Player.First);
+                    State.CachedData.ResultSecondPlayer = State.CachedData.ResultFirstPlayer.InvertResult();
+                }
+                else
+                {
+                    State.CachedData.ResultSecondPlayer = CalculateGameResult(Player.Second);
+                    State.CachedData.ResultFirstPlayer = State.CachedData.ResultSecondPlayer.InvertResult();
+                }
 
-            return (GameResult)cachedData.Result;
+                // The game result can already tell us who the winner is, so we set it in the cache to avoid unnecessary calculations
+                var result = player == Player.First ? State.CachedData.ResultFirstPlayer.Value : State.CachedData.ResultSecondPlayer.Value;
+                if (result == GameResult.Victory || result == GameResult.Defeat)
+                {
+                    State.CachedData.Winner = result == GameResult.Victory ? player : player.ToOppositePlayer();
+                }
+
+                return result;
+            }
+
+            return player == Player.First ? State.CachedData.ResultFirstPlayer.Value : State.CachedData.ResultSecondPlayer.Value;
         }
 
-        ///<inheritdoc/>
         public double GetGameScore(Player player)
         {
             // Since calculating the game score can be expensive, we only do it if necessary
-            var cachedData = GetCachedData();
-            cachedData.Score ??= CalculateGameScore(player);
+            State.CachedData.Score ??= CalculateGameScore(player);
 
-            return (double)cachedData.Score;
+            return (double)State.CachedData.Score;
         }
 
-        ///<inheritdoc/>
         public Player GetWinner()
         {
             // Since calculating a winner can be expensive, we only do it if necessary
-            var cachedData = GetCachedData();
-            cachedData.Winner ??= CalculateWinner();
+            if (State.CachedData.Winner == null)
+            {
+                var winer = CalculateWinner();
+                State.CachedData.Winner = winer;
+                SetWinner(winer);
+            }
 
-            return (Player)cachedData.Winner;
+            return (Player)State.CachedData.Winner;
+        }
+
+        protected void SetWinner(Player winner)
+        {
+            State.CachedData.Winner = winner;
+
+            // The winner can already tell us what the game result is, so we set it in the cache to avoid unnecessary calculations
+            if (State.CachedData.Winner.Value != Player.None)
+            {
+                State.CachedData.ResultFirstPlayer = State.CachedData.Winner.Value == Player.First ? GameResult.Victory : GameResult.Defeat;
+                State.CachedData.ResultSecondPlayer = State.CachedData.Winner.Value == Player.Second ? GameResult.Victory : GameResult.Defeat;
+            }
         }
 
         private GameResult CalculateGameResult(Player player)
@@ -85,7 +109,8 @@ namespace Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models
             var winner = GetWinner();
             if (winner == Player.None)
             {
-                if (AreThereValidMoves())
+                var currentPlayer = IsPlayerTurn(Player.First) ? Player.First : Player.Second;
+                if (AreThereValidMoves(currentPlayer))
                 {
                     return GameResult.StillGame;
                 }
@@ -107,63 +132,40 @@ namespace Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models
             };
         }
 
-        private void ClearCachedData()
+        public virtual bool AreThereValidMoves(Player player)
         {
-            State.CachedData = null;
+            return GetValidMoves(player).Any();
         }
 
-        private StateCache<TMoveInfo> GetCachedData()
+        public List<TMoveInfo> GetMoveHistory()
         {
-            State.CachedData = State.CachedData ?? new StateCache<TMoveInfo>();
-            return State.CachedData;
+            return State.History.ToList();
         }
 
-        ///<inheritdoc/>
-        public TBoardState GetStateCopy()
+        public IBoard<TMoveInfo, TBoardState> Clone()
         {
-            return State.CloneBoardState() as TBoardState;
+            var clonedBoardState = State.CloneBoardState() as TBoardState;
+            return CreateNew(clonedBoardState, MovesEngine);
         }
 
-        ///<inheritdoc/>
-        public void RestoreStateFromCopy(TBoardState state)
-        {
-            State = state.CloneBoardState() as TBoardState;
-        }
-
-        ///<inheritdoc/>
         public override string ToString()
         {
             return State.ToString();
         }
 
-        /// <summary>
-        /// Makes the specified move.
-        /// </summary>
-        /// <param name="moveInfo">The move to make.</param>
-        protected abstract void MakeMove(TMoveInfo moveInfo);
+        public abstract bool IsValidMove(TMoveInfo moveInfo);
+
+        public abstract void MakeMove(TMoveInfo moveInfo);
 
         /// <summary>
-        /// Determines whether the specified move is valid or not.
-        /// </summary>
-        /// <param name="moveInfo">The move to check.</param>
-        /// <returns>True if the move is valid and coud be made; false otherwise.</returns>
-        protected abstract bool IsValidMove(TMoveInfo moveInfo);
-
-        /// <summary>
-        /// Determines whether or not there are still some valid moves that could be made.
-        /// </summary>
-        /// <returns>True if some moves could still be made; false otherwise.</returns>
-        protected abstract bool AreThereValidMoves();
-
-        /// <summary>
-        /// Calculates the valid moves for the specified player.
+        /// Calculates the valid moves for the specified player. Will be called automatically by the game engine.
         /// </summary>
         /// <param name="player">The player for whom the moves will be calculated.</param>
         /// <returns>A list with all the valid moves for the specified player.</returns>
-        protected abstract IList<TMoveInfo> CalculateValidMoves(Player player);
+        protected abstract List<TMoveInfo> CalculateValidMoves(Player player);
 
         /// <summary>
-        /// Calculates the winning player on this board.
+        /// Calculates the winning player on this board. Will be called automatically by the game engine.
         /// </summary>
         /// <returns>The winning player, or null if no player can be considered a winner.</returns>
         protected abstract Player CalculateWinner();
@@ -172,10 +174,19 @@ namespace Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models
         /// Calculates a heuristic score that indicates how likely the specified player is to win or lose.
         /// Positive values indicate likelihood of victory, while negative values indicate likelihood of defeat.
         /// Since it will only be called when the game still doesn't have a winner, the returned values must be
-        /// between -0.999 and +0.999, as +1 and -1 are reserved for actual victories and defeats.
+        /// lower than +1 and higher than -1, which are reserved for actual, certain victories and defeats.
+        /// Will be called automatically by the game engine.
         /// </summary>
         /// <param name="player">The player for whom the score will be calculated.</param>
         /// <returns>The score that estimates how likely the player is to win or lose.</returns>
         protected abstract double CalculateHeuristicGameScore(Player player);
+
+        /// <summary>
+        /// Gets a new instance of the board. Will be called automatically by the game engine.
+        /// </summary>
+        /// <param name="boardState">The state of the board to create.</param>
+        /// <param name="movesEngine">The moves engine that the board will make use of.</param>
+        /// <returns>A new instance of the board created with the specified parameters.</returns>
+        protected abstract BaseBoard<TMoveInfo, TBoardState> CreateNew(TBoardState boardState, ITwoPlayerZeroSumGameMovesEngine movesEngine);
     }
 }

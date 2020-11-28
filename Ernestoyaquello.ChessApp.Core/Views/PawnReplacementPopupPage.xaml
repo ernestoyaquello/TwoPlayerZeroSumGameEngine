@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<popup:PopupPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:popup="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup"
+    xmlns:controls="clr-namespace:Ernestoyaquello.ChessApp.Controls"
+    xmlns:chess="clr-namespace:Ernestoyaquello.Chess.Models;assembly=Ernestoyaquello.Chess"
+    x:Class="Ernestoyaquello.ChessApp.Views.PawnReplacementPopupPage"
+    CloseWhenBackgroundIsClicked="False"
+    x:Name="pawnReplacementPopup">
+
+    <Grid
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        Padding="40">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid
+            Grid.Row="1"
+            Grid.Column="1"
+            Padding="15"
+            BackgroundColor="#e2d5ca">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label
+                Grid.Row="0"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Padding="20,10"
+                Text="Pawn Replacement"
+                FontSize="25" />
+
+            <CollectionView
+                Grid.Row="1"
+                x:Name="SelectableMovesList"
+                HorizontalOptions="Center"
+                SelectionMode="None"
+                ItemsLayout="HorizontalList"
+                ItemsSource="{Binding Source={x:Reference pawnReplacementPopup}, Path=Pieces}">
+
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate
+                        x:DataType="chess:Piece">
+
+                        <controls:ChessBoardPieceView
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            WidthRequest="175"
+                            HeightRequest="175"
+                            IsClickable="True"
+                            Piece="{Binding .}"
+                            OnTappedCommand="{Binding Source={x:Reference pawnReplacementPopup}, Path=ConfirmSelectionCommand}" />
+
+                    </DataTemplate>
+
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+        </Grid>
+
+    </Grid>
+    
+</popup:PopupPage>

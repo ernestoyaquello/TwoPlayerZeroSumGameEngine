@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Ernestoyaquello.TicTacToe;
 using Ernestoyaquello.TicTacToe.Models;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Engine;
 using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models;
+using Ernestoyaquello.TwoPlayerZeroSumGameEngine.Util;
 
 namespace Ernestoyaquello.TicTacToeApp
 {
@@ -10,26 +11,28 @@ namespace Ernestoyaquello.TicTacToeApp
     {
         static async Task Main(string[] args)
         {
-            var ticTacToeEngine = new TicTacToeEngine();
-            await PlayTicTacToe(ticTacToeEngine);
+            var gameEngine = new TwoPlayerZeroSumGameMovesEngine();
+            gameEngine.Initialize(9);
+            await PlayTicTacToe(gameEngine);
         }
 
-        private static async Task PlayTicTacToe(TicTacToeEngine gameEngine, bool firstPlayerStarts = true)
+        private static async Task PlayTicTacToe(TwoPlayerZeroSumGameMovesEngine gameEngine, bool humanIsFirstPlayer = true)
         {
-            var board = new TicTacToeBoard();
-            gameEngine.Initialise(board);
-            PrintBoard(board);
+            var humanPlayer = humanIsFirstPlayer ? Player.First : Player.Second;
+            var board = new TicTacToeBoard(gameEngine);
+            PrintBoard(board, humanPlayer);
 
-            if (!firstPlayerStarts)
+            if (!humanIsFirstPlayer)
             {
                 Console.CursorVisible = false;
                 Console.SetCursorPosition(0, Console.WindowHeight);
                 Console.Write("Calculating first move...");
 
-                var firstMove = await gameEngine.GetBestMove(Player.Second).ConfigureAwait(false);
-                board.TryMakeMove(firstMove);
+                var firstMoveResult = await gameEngine.CalculateBestMove<TicTacToeBoard, TicTacToeMoveInfo, TicTacToeBoardState>(board, Player.First).ConfigureAwait(false);
+                var firstMove = firstMoveResult.BestMove;
+                gameEngine.TryMakeMove<TicTacToeBoard, TicTacToeMoveInfo, TicTacToeBoardState>(board, firstMove, false);
 
-                PrintBoard(board);
+                PrintBoard(board, humanPlayer);
             }
 
             var selectedRow = 0;
@@ -65,20 +68,21 @@ namespace Ernestoyaquello.TicTacToeApp
                         break;
 
                     case ConsoleKey.Enter:
-                        DrawMove();
+                        DrawMove(humanPlayer);
                         Console.SetCursorPosition(0, Console.WindowHeight);
                         Console.Write("Calculating move...");
-                        var move = new TicTacToeMoveInfo(Player.First, selectedRow, selectedColumn);
-                        gameResult = await gameEngine.MakeMoveAndGetResult(move).ConfigureAwait(false);
-                        PrintBoard(board);
+                        var humanMove = new TicTacToeMoveInfo(humanPlayer, selectedRow, selectedColumn);
+                        await gameEngine.MakeMoveAgainstMachine<TicTacToeBoard, TicTacToeMoveInfo, TicTacToeBoardState>(board, humanMove).ConfigureAwait(false);
+                        gameResult = board.GetGameResult(humanMove.Player);
+                        PrintBoard(board, humanPlayer);
                         break;
 
                     case ConsoleKey.Q:
-                        PrintBoard(board);
+                        PrintBoard(board, humanPlayer);
                         return;
 
                     default:
-                        PrintBoard(board);
+                        PrintBoard(board, humanPlayer);
                         break;
                 }
 
@@ -87,13 +91,13 @@ namespace Ernestoyaquello.TicTacToeApp
             }
 
             PrintGameResult(gameResult);
-            await PlayTicTacToe(gameEngine, !firstPlayerStarts);
+            await PlayTicTacToe(gameEngine, !humanIsFirstPlayer);
         }
 
-        private static void DrawMove()
+        private static void DrawMove(Player humanPlayer)
         {
             Console.CursorVisible = false;
-            Console.Write(TicTacToeBoard.FromPlayerToString(Player.First));
+            Console.Write(TicTacToeBoard.FromPlayerToString(humanPlayer));
         }
 
         private static void PrintGameResult(GameResult gameResult)
@@ -119,7 +123,7 @@ namespace Ernestoyaquello.TicTacToeApp
             Console.ReadKey();
         }
 
-        private static void PrintBoard(TicTacToeBoard board)
+        private static void PrintBoard(TicTacToeBoard board, Player humanPlayer)
         {
             Console.Clear();
             var cursorTop = Console.WindowHeight - 9;
@@ -129,8 +133,8 @@ namespace Ernestoyaquello.TicTacToeApp
             Console.Write("\n");
             Console.Write("Players:\n");
             Console.Write("\n");
-            Console.Write($"* You: {TicTacToeBoard.FromPlayerToString(Player.First)}\n");
-            Console.Write($"* Computer: {TicTacToeBoard.FromPlayerToString(Player.Second)}\n");
+            Console.Write($"* You: {TicTacToeBoard.FromPlayerToString(humanPlayer)}\n");
+            Console.Write($"* Computer: {TicTacToeBoard.FromPlayerToString(humanPlayer.ToOppositePlayer())}\n");
             Console.Write("\n");
             Console.Write("How to play:\n");
             Console.Write("\n");

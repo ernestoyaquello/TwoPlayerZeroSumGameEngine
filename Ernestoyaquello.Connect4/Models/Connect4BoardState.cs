@@ -9,6 +9,7 @@ namespace Ernestoyaquello.Connect4.Models
         public Player[][] Columns { get; }
 
         public Connect4BoardState(Player[][] columns)
+            : base()
         {
             Columns = columns;
         }

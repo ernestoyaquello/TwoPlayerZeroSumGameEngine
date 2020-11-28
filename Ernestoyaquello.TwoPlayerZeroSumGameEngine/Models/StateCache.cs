@@ -5,27 +5,30 @@ namespace Ernestoyaquello.TwoPlayerZeroSumGameEngine.Models
 {
     internal class StateCache<TMoveInfo> where TMoveInfo : BaseMoveInfo
     {
-        internal Player? Winner { get; set; }
-        internal double? Score { get; set; }
-        internal GameResult? Result { get; set; }
-        internal Dictionary<Player, IList<TMoveInfo>> ValidMovesPerPlayer { get; private set; }
+        public Player? Winner { get; set; }
+        public double? Score { get; set; }
+        public GameResult? ResultFirstPlayer { get; set; }
+        public GameResult? ResultSecondPlayer { get; set; }
+        public Dictionary<Player, List<TMoveInfo>> ValidMovesPerPlayer { get; private set; }
 
-        internal StateCache()
+        public StateCache()
         {
             Winner = null;
             Score = null;
-            Result = null;
-            ValidMovesPerPlayer = new Dictionary<Player, IList<TMoveInfo>>();
+            ResultFirstPlayer = null;
+            ResultSecondPlayer = null;
+            ValidMovesPerPlayer = new Dictionary<Player, List<TMoveInfo>>();
         }
 
-        internal StateCache<TMoveInfo> Clone()
+        public StateCache<TMoveInfo> Clone()
         {
             return new StateCache<TMoveInfo>
             {
                 Winner = Winner,
                 Score = Score,
-                Result = Result,
-                ValidMovesPerPlayer = ValidMovesPerPlayer.ToDictionary(x => x.Key, x => x.Value),
+                ResultFirstPlayer = ResultFirstPlayer,
+                ResultSecondPlayer = ResultSecondPlayer,
+                ValidMovesPerPlayer = ValidMovesPerPlayer.ToDictionary(x => x.Key, x => x.Value.ToList()),
             };
         }
     }

@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Ernestoyaquello.ChessApp.ViewModels"
+    xmlns:vmModels="clr-namespace:Ernestoyaquello.ChessApp.ViewModels.Models"
+    x:DataType="vm:TestsPageViewModel"
+    x:Class="Ernestoyaquello.ChessApp.Views.TestsPage"
+    BackgroundColor="#1d1c1b"
+    Title="{Binding Title}">
+    
+    <Grid
+        Padding="50"
+        ColumnSpacing="10"
+        RowSpacing="10">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Button
+            Grid.Row="1"
+            Grid.Column="1"
+            Padding="10"
+            TextColor="White"
+            BackgroundColor="DarkOrange"
+            FontSize="15"
+            Text="Open castling test"
+            Command="{Binding OpenCastlingTestCommand}" />
+
+        <Button
+            Grid.Row="1"
+            Grid.Column="2"
+            Padding="10"
+            TextColor="White"
+            BackgroundColor="DarkOrange"
+            FontSize="15"
+            Text="Open pawn promotion test"
+            Command="{Binding OpenPawnReplacementTestCommand}" />
+
+        <Button
+            Grid.Row="1"
+            Grid.Column="3"
+            Padding="10"
+            TextColor="White"
+            BackgroundColor="DarkOrange"
+            FontSize="15"
+            Text="Open en passant test"
+            Command="{Binding OpenEnPassantTestCommand}" />
+
+        <Button
+            Grid.Row="2"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            Padding="10"
+            TextColor="White"
+            BackgroundColor="DarkOrange"
+            FontSize="15"
+            Text="Run automatic tests"
+            Command="{Binding RunAutomaticTestsCommand}" />
+        
+        <ListView
+            Grid.Row="3"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            x:Name="TestsList"
+            SelectionMode="None"
+            BackgroundColor="#3a3a3a"
+            ItemsSource="{Binding AutomaticTests}">
+
+            <ListView.ItemTemplate>
+
+                <DataTemplate
+                    x:DataType="vmModels:ChessTestItem">
+
+                    <ViewCell>
+
+                        <Grid
+                            VerticalOptions="Center"
+                            ColumnSpacing="10"
+                            Padding="20,10">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label
+                                Grid.Column="0"
+                                HorizontalOptions="StartAndExpand"
+                                VerticalOptions="Center"
+                                HorizontalTextAlignment="Start"
+                                VerticalTextAlignment="Center"
+                                FontSize="16"
+                                Margin="0,0,10,0"
+                                TextColor="#bebebe"
+                                Text="{Binding TestType}" />
+
+                            <Label
+                                Grid.Column="1"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                VerticalTextAlignment="Center"
+                                FontSize="16"
+                                Margin="0,0,10,0"
+                                TextColor="White"
+                                Text="{Binding Progress, StringFormat='{0:P}'}" />
+
+                            <Label
+                                Grid.Column="2"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                VerticalTextAlignment="Center"
+                                FontSize="16"
+                                Margin="0,0,10,0"
+                                TextColor="White"
+                                Text="{Binding Elapsed, StringFormat='{0:mm\\:ss\\:fff}'}" />
+                            
+                            <Label
+                                Grid.Column="3"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                VerticalTextAlignment="Center"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                Text="{Binding Status, Converter={StaticResource FromAutomaticTestStatusToSuccessTextConverter}}"
+                                TextColor="{Binding Status, Converter={StaticResource FromAutomaticTestStatusToColorTextConverter}}"/>
+
+                        </Grid>
+
+                    </ViewCell>
+
+                </DataTemplate>
+
+            </ListView.ItemTemplate>
+
+        </ListView>
+
+    </Grid>
+    
+</ContentPage>

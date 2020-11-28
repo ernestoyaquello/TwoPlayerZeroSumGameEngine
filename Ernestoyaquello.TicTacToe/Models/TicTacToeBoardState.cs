@@ -9,6 +9,7 @@ namespace Ernestoyaquello.TicTacToe.Models
         public Player[][] BoardData { get; }
 
         public TicTacToeBoardState(Player[][] boardData)
+            : base()
         {
             BoardData = boardData;
         }
